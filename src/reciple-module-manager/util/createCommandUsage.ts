@@ -10,7 +10,7 @@ export function createCommandUsage(command: CommandBuilder) {
 
         const name = option.required ? option.name : chalk.italic(option.name);
         
-        return `${brackets[0]}${name}${ option.type !== 'STRING' ? ':' + chalk.gray(option.name) : '' }${brackets[1]}`;
+        return `${brackets[0]}${name}${ option.type !== 'STRING' ? ':' + chalk.gray(option.type) : '' }${brackets[1]}`;
     });
 
     return `${command.name}${options.length ? ' ' + options.join(' ') : ''}`;
