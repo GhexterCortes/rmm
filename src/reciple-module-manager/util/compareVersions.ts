@@ -1,5 +1,5 @@
 export default (version1: string, version2: string): boolean => {
-    if (version1 === version2) return true;
+    if (version1.trim() === version2.trim()) return true;
 
     const v1 = version1.split('.').map(v => parseInt(v));
     const v2 = version2.split('.').map(v => parseInt(v));

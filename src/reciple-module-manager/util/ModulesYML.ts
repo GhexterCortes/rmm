@@ -38,6 +38,8 @@ export class ModulesYml {
         this.path = savedir ?? './';
         this.modulesFolder = modulesFolder ?? './modules';
         this.modules = modules ?? [];
+
+        this.load();
     }
 
     public async addZip(zipPath: string, spin?: Ora): Promise<ModulesYml> {
@@ -66,7 +68,9 @@ export class ModulesYml {
                 }
 
                 spinner.text = `Removing ${chalk.yellow(path.join(cwd, conflictedModule.main))}`;
-                await this.remove(conflictedModule.name);
+                await this.remove(conflictedModule.name, spinner, false);
+
+                spinner.start();
             }
 
             const conflictedFiles = readdirSync(cwd).filter(f => f == reciple.main || reciple.includes.includes(f));
@@ -74,14 +78,15 @@ export class ModulesYml {
 
             spinner.text = `Adding ${chalk.yellow(reciple.main)}`;
             for (const entry of Object.values(entries)) {
-                if (reciple.name !== entry.name && !reciple.includes.includes(entry.name)) continue;
+                if (reciple.main !== entry.name && !reciple.includes.includes(entry.name)) continue;
 
                 spinner.text = `Extracting ${chalk.yellow(entry)}`;
 
-                await zip.entryData(entry).then(data => writeFileSync(path.join(cwd, entry.name), data));
+                await zip.extract(entry, path.join(cwd, entry.name)).catch(err => {throw err});
+                if (!existsSync(path.join(cwd, entry.name))) throw new Error(`Error extracting ${chalk.yellow(entry)}`);
             }
 
-            spinner.succeed(`${chalk.yellow(reciple.name)} added`);
+            spinner.succeed(`${chalk.yellow(reciple.name)} added to ${chalk.blue(cwd)}`);
             this.add(reciple);
         } catch (err) {
             spinner.fail((err as Error).message);
@@ -164,8 +169,8 @@ export class ModulesYml {
         return this;
     }
 
-    public async remove(name: string): Promise<ModulesYml> {
-        const spinner = ora({ text: `Removing ${chalk.yellow(name)}`, spinner: 'dots12' }).start();
+    public async remove(name: string, spin?: Ora, save: boolean = true): Promise<ModulesYml> {
+        const spinner = spin ?? ora({ text: `Removing ${chalk.yellow(name)}`, spinner: 'dots12' }).start();
 
         try {
             const cwd = path.join(process.cwd(), this.modulesFolder);
@@ -192,7 +197,7 @@ export class ModulesYml {
         }
 
         this.modules = this.modules.filter(m => m.name !== name);
-        this.save();
+        if (save) this.save();
 
         return this;
     }
@@ -249,7 +254,7 @@ export class ModulesYml {
         const modulesYML = readFileSync(path.join(this.path, 'modules.yml'), 'utf8');
         this.modules = yml.parse(modulesYML);
 
-        if (compareVersions(supportedVersion, this.version)) error(`Unsupported version ${chalk.yellow(this.version)}`);
+        if (!compareVersions(supportedVersion, this.version)) error(`Unsupported version ${chalk.yellow(this.version)}`);
         return this;
     }
 
