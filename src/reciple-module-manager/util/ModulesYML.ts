@@ -251,7 +251,7 @@ export class ModulesYml {
     }
 
     public load(): ModulesYml {
-        if (!existsSync('modules.yml')) error(`No ${chalk.yellow('modules.yml')} found in ${chalk.yellow(process.cwd())}. Run ${chalk.yellow('rmm init')} to create one.`);
+        if (!existsSync('modules.yml')) writeFileSync('modules.yml', '[]');
 
         const modulesYML = readFileSync(path.join(this.path, 'modules.yml'), 'utf8');
         this.modules = yml.parse(modulesYML);
