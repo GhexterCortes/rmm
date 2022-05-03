@@ -62,6 +62,8 @@ export class ModulesYml {
             if (!reciple.supportedVersions.includes(this.version)) throw new Error(`Module ${chalk.yellow(reciple.name)} does not support ${chalk.yellow(this.version)}`);
 
             const conflictedModule = this.modules.find(m => m.name === reciple.name);
+
+            if (!ModulesYml.validVersion(reciple.version)) throw new Error(`Invalid version ${chalk.yellow(reciple.version)}`);
             if (conflictedModule) {
                 if (!compareVersions(conflictedModule.version, reciple.version)) {
                     throw new Error(`${chalk.yellow(conflictedModule.name)} is already installed and is newer than ${chalk.yellow(reciple.name)}`);
@@ -288,5 +290,9 @@ export class ModulesYml {
         }
 
         return sortedDependencies;
+    }
+
+    public static validVersion(version: string) {
+        return version.split('.').length === 3 && version.split('.').every(v => /^\d+$/.test(v));
     }
 }
