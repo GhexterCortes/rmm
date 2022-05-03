@@ -9,7 +9,7 @@ Reciple module manager `rmm` is a tool for managing and installing Reciple modul
 To install rmm run
 
 ```bash
-npm i -g rmm
+npm i -g reciple-module-manager
 ```
 
 ## Commands
