@@ -1,7 +1,7 @@
 {
   "name": "reciple-module-utility",
   "description": "Manage Reciple modules",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "GPL-3.0",
   "author": {
     "name": "GhexterCortes",
@@ -19,7 +19,8 @@
   "scripts": {
     "clean": "rm -rf bin",
     "compile": "yarn clean && tsc",
-    "build": "yarn compile && npm un reciple-module-utility -g && npm i . -g"
+    "build": "yarn compile && npm un reciple-module-utility -g && npm i . -g",
+    "build:publish": "yarn run build && yarn publish"
   },
   "dependencies": {
     "adm-zip": "^0.5.9",
