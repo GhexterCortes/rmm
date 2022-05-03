@@ -19,7 +19,7 @@
   "scripts": {
     "clean": "rm -rf bin",
     "compile": "yarn clean && tsc",
-    "build": "yarn compile && npm un reciple-module-utility -g && npm i . -g",
+    "build": "yarn compile && npm un reciple-module-manager -g && npm i . -g",
     "build:publish": "yarn run build && yarn publish"
   },
   "dependencies": {
