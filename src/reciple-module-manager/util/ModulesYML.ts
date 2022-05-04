@@ -109,7 +109,9 @@ export class ModulesYml {
             const download = await axios.get(downloadUrl).then(res => res.data).catch(err => {throw err});
             if (!download || !download?.zipball_url) throw new Error('No assets found');
 
-            const zipHttp = await axios.get(download.zipball_url, { responseType: 'stream' }).catch(err => {throw err});
+            const asset = download.assets.length ? (download.assets.find((a: { [key: string]: any }) => a.name.toLowerCase() == 'module.zip')?.browser_download_url ?? null) : null;
+
+            const zipHttp = await axios.get(asset ?? download.zipball_url, { responseType: 'stream' }).catch(err => {throw err});
             const zipPath = path.join(this.path, '.rmmcache/'+ randomUUID() +'/'+ githubModule.owner +'/'+ githubModule.repo +'.zip');
 
             mkdirSync(path.dirname(zipPath), { recursive: true });
@@ -124,7 +126,13 @@ export class ModulesYml {
                     storeEntries: true
                 });
 
-                const firstEntry = Object.values(await zip.entries())[0];
+                const contents = await zip.entries();
+                const firstEntry = Object.values(contents)[0];
+
+                if (Object.keys(contents).length > 1 && Object.keys(contents).includes('.reciple')) {
+                    this.addZip(zipPath, spinner);
+                    return this;
+                }
                 if (!firstEntry?.isDirectory) throw new Error('First entry is not a directory');
 
                 const modulePath = path.join(path.dirname(zipPath), 'module');
