@@ -29,12 +29,17 @@ export default new CommandBuilder()
 
         const overwrite = options[1] ? options[1].value : false;
         
-        if (outputDir.endsWith('.zip') && lstatSync(outputDir).isFile()) {
-            outputDir = path.dirname(outputDir);
+        if (outputDir.endsWith('.zip')) {
             fileName = path.basename(outputDir);
+            outputDir = path.dirname(outputDir);
         }
 
         mkdirSync(outputDir, { recursive: true });
+
+        if (existsSync(path.join(outputDir, fileName ?? '')) && lstatSync(path.join(outputDir, fileName ?? '')).isDirectory()) {
+            outputDir = path.join(outputDir, fileName ?? '');
+            fileName = undefined;
+        }
         
         if (!existsSync('.reciple')) error('No .reciple file found in the current directory');
 
