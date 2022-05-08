@@ -264,7 +264,6 @@ export class ModulesYml {
         const modulesYML = readFileSync(path.join(this.path, 'modules.yml'), 'utf8');
         this.modules = yml.parse(modulesYML);
 
-        if (!compareVersions(supportedVersion, this.version)) error(`Unsupported version ${chalk.yellow(this.version)}`);
         return this;
     }
 
